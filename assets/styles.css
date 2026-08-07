@@ -247,7 +247,7 @@ section { padding-block: var(--section); }
   text-decoration: none;
   flex-shrink: 0;
 }
-.brand-mark { width: 34px; height: 34px; flex-shrink: 0; }
+.brand-mark { height: 32px; width: auto; flex-shrink: 0; }
 .brand-text {
   font-family: var(--display);
   font-size: 1.42rem;
