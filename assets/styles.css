@@ -808,3 +808,8 @@ button[disabled] { opacity: 0.6; cursor: not-allowed; }
 [dir="rtl"] .ticks li::before { left: auto; right: 0; }
 [dir="rtl"] .pillar .num { letter-spacing: 0; }
 [dir="rtl"] body { font-family: "IBM Plex Sans Arabic", var(--body); }
+
+
+               /* ---------- 19. Header CTA: hide the menu copy on desktop ---------- */
+.nav-links > li:last-child { display: none; }
+@media (max-width: 860px) { .nav-links > li:last-child { display: block; border-bottom: none; padding-top: 1rem; } }
