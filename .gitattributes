@@ -1,0 +1,13 @@
+# Normalise line endings so Windows and Linux edits don't create phantom diffs.
+* text=auto eol=lf
+
+# Binary — never touch these
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary

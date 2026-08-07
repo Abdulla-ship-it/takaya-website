@@ -4,21 +4,45 @@ Website for Takaya, a learning and development institute in Muscat, Sultanate of
 
 Static site. No build step, no framework, no dependencies — just HTML, CSS and vanilla JavaScript.
 
-## Pages
+## Languages
+
+**Arabic is the primary language and lives at the root. English is under `/en/`.**
+
+| Arabic (default) | English |
+|---|---|
+| `/index.html` | `/en/index.html` |
+| `/courses.html` | `/en/courses.html` |
+| `/coaching.html` | `/en/coaching.html` |
+| `/about.html` | `/en/about.html` |
+| `/contact.html` | `/en/contact.html` |
+| `/404.html` | `/en/404.html` |
+
+Every page carries a language switch in the header that jumps to the *same* page in
+the other language, plus `hreflang` tags (with `x-default` pointing at Arabic) so
+search engines serve the right version.
+
+The Arabic pages set `<html lang="ar" dir="rtl">`. Section 20 of `assets/styles.css`
+handles the RTL flip — including removing letter-spacing and uppercase from small
+labels, where those styles hurt Arabic legibility, and keeping prices and phone
+numbers running left-to-right via the `.ltr` class.
+
+## Shared files
 
 | File | Purpose |
 |---|---|
-| `index.html` | Homepage — hero, approach, featured courses, coaching, testimonials |
-| `courses.html` | Full course catalogue with category filtering + corporate training |
-| `coaching.html` | One-to-one coaching: process, packages, FAQ |
-| `about.html` | Story, values, faculty, FAQ |
-| `contact.html` | Enquiry form and contact details |
-| `404.html` | Custom not-found page |
-| `assets/styles.css` | Design system and all styling |
+| `assets/styles.css` | Design system, responsive rules, RTL |
 | `assets/main.js` | Navigation, scroll reveal, accordions, filters, form handling |
 | `functions/api/enquiry.js` | Server-side enquiry endpoint (Cloudflare Pages Function) |
 | `_headers` | Security and caching headers |
-| `robots.txt`, `sitemap.xml` | Search engine basics |
+| `robots.txt`, `sitemap.xml` | Search engine basics, both languages |
+
+Both languages post to the same `/api/enquiry` endpoint.
+
+### Editing content
+
+Text lives directly in the HTML — there is no CMS. When you change a course name or
+price, change it in **both** the Arabic file and its English counterpart, and in the
+`<select>` list on both contact pages.
 
 ## Running locally
 

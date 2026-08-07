@@ -802,14 +802,100 @@ button[disabled] { opacity: 0.6; cursor: not-allowed; }
   .acc-panel-inner { padding-right: 0; }
 }
 
-/* ---------- 18. RTL / Arabic ready ---------- */
-[dir="rtl"] .quote { border-left: none; border-right: 2px solid var(--brass); padding-left: 0; padding-right: clamp(1.3rem, 2.4vw, 2rem); }
-[dir="rtl"] .ticks li { padding-left: 0; padding-right: 1.7rem; }
-[dir="rtl"] .ticks li::before { left: auto; right: 0; }
-[dir="rtl"] .pillar .num { letter-spacing: 0; }
-[dir="rtl"] body { font-family: "IBM Plex Sans Arabic", var(--body); }
-
-
-               /* ---------- 19. Header CTA: hide the menu copy on desktop ---------- */
+/* ---------- 18. Header CTA: hide the menu copy on desktop ---------- */
 .nav-links > li:last-child { display: none; }
-@media (max-width: 860px) { .nav-links > li:last-child { display: block; border-bottom: none; padding-top: 1rem; } }
+@media (max-width: 860px) {
+  .nav-links > li:last-child { display: block; border-bottom: none; padding-top: 1rem; }
+}
+
+/* ---------- 19. Language switch ---------- */
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  white-space: nowrap;
+  transition: all 0.25s var(--ease);
+}
+.lang-switch:hover {
+  color: var(--green);
+  border-color: var(--green-soft);
+  background: rgba(62, 97, 87, 0.05);
+}
+.lang-switch .globe { flex-shrink: 0; opacity: 0.65; }
+.lang-switch:hover .globe { opacity: 1; }
+
+@media (max-width: 500px) {
+  .lang-switch { padding: 0.45rem 0.65rem; }
+  .lang-switch .label { display: none; }
+}
+
+/* ============================================================
+   20. RTL — Arabic
+   The Arabic pages set <html lang="ar" dir="rtl">. Logical
+   properties handle most of the flip; these rules fix the
+   handful of places that use physical directions.
+   ============================================================ */
+
+[lang="ar"] {
+  --display: "Noto Kufi Arabic", "IBM Plex Sans Arabic", Tahoma, sans-serif;
+  --body:    "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+}
+
+[dir="rtl"] body { line-height: 1.8; }
+
+/* Arabic script has no uppercase — tracking out letters hurts legibility */
+[dir="rtl"] .eyebrow,
+[dir="rtl"] .stat-lbl,
+[dir="rtl"] .footer-h,
+[dir="rtl"] .tag,
+[dir="rtl"] .ribbon,
+[dir="rtl"] .field label,
+[dir="rtl"] .brand-sub {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3 { letter-spacing: 0; line-height: 1.35; }
+[dir="rtl"] .acc-btn { letter-spacing: 0; text-align: right; }
+
+/* Physical-direction fixes */
+[dir="rtl"] .quote {
+  border-left: none;
+  border-right: 2px solid var(--brass);
+  padding-left: 0;
+  padding-right: clamp(1.3rem, 2.4vw, 2rem);
+}
+[dir="rtl"] .ticks li { padding-left: 0; padding-right: 1.7rem; }
+[dir="rtl"] .ticks li::before { left: auto; right: 0; transform: rotate(-45deg); }
+[dir="rtl"] .pillar .num { letter-spacing: 0; }
+[dir="rtl"] .nav-links a::after { transform-origin: right; }
+[dir="rtl"] .ribbon { right: auto; left: 1.8rem; }
+[dir="rtl"] .hero::after { right: auto; left: -12%; }
+[dir="rtl"] .field select {
+  background-position: left 1rem center;
+  padding-right: 1rem;
+  padding-left: 2.6rem;
+}
+[dir="rtl"] .acc-panel-inner { padding-right: 0; padding-left: 3rem; }
+[dir="rtl"] .tlink .arw { transform: scaleX(-1); }
+[dir="rtl"] .tlink:hover .arw { transform: scaleX(-1) translateX(2px); }
+[dir="rtl"] .price-amt sup { margin-right: 0; margin-left: 0.15em; }
+
+/* Keep prices and phone numbers reading left-to-right inside RTL text */
+[dir="rtl"] .price,
+[dir="rtl"] .price-amt,
+[dir="rtl"] .stat-num,
+[dir="rtl"] .ltr { direction: ltr; unicode-bidi: embed; display: inline-block; }
+[dir="rtl"] .stat-num { display: block; }
+
+@media (max-width: 860px) {
+  [dir="rtl"] .acc-panel-inner { padding-left: 0; }
+}
