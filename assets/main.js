@@ -52,6 +52,81 @@
     }
   }
 
+  /* ---- Animated stat counters ---- */
+  var statEls = document.querySelectorAll('.stat-num');
+  if (statEls.length) {
+    var arabicDigits = '٠١٢٣٤٥٦٧٨٩';
+    var reduceMotion = window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var toArabicDigits = function (str) {
+      return str.replace(/[0-9]/g, function (d) { return arabicDigits[d]; });
+    };
+
+    var parseStat = function (el) {
+      var raw = el.textContent.trim();
+      var isArabic = /[٠-٩]/.test(raw);
+      var westernised = raw.replace(/[٠-٩]/g, function (d) {
+        return String(arabicDigits.indexOf(d));
+      });
+      var match = westernised.match(/(\+?)(\d+)(\+?)/);
+      if (!match) return null;
+      return {
+        value: parseInt(match[2], 10),
+        prefixPlus: match[1] === '+',
+        suffixPlus: match[3] === '+',
+        isArabic: isArabic
+      };
+    };
+
+    var formatStat = function (n, meta) {
+      var s = String(n);
+      if (meta.isArabic) s = toArabicDigits(s);
+      if (meta.prefixPlus) s = '+' + s;
+      if (meta.suffixPlus) s = s + '+';
+      return s;
+    };
+
+    var animateStat = function (el, meta) {
+      var duration = 1100;
+      var start = null;
+      var step = function (ts) {
+        if (!start) start = ts;
+        var progress = Math.min((ts - start) / duration, 1);
+        var eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = formatStat(Math.round(eased * meta.value), meta);
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          el.textContent = formatStat(meta.value, meta);
+        }
+      };
+      requestAnimationFrame(step);
+    };
+
+    var stats = [];
+    statEls.forEach(function (el) {
+      var meta = parseStat(el);
+      if (!meta) return;
+      if (!reduceMotion) el.textContent = formatStat(0, meta);
+      stats.push({ el: el, meta: meta });
+    });
+
+    if (reduceMotion || !('IntersectionObserver' in window)) {
+      stats.forEach(function (s) { s.el.textContent = formatStat(s.meta.value, s.meta); });
+    } else if (stats.length) {
+      var statIO = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          var match = stats.filter(function (s) { return s.el === entry.target; })[0];
+          if (match) animateStat(match.el, match.meta);
+          statIO.unobserve(entry.target);
+        });
+      }, { threshold: 0.4 });
+      stats.forEach(function (s) { statIO.observe(s.el); });
+    }
+  }
+
   /* ---- Accordions ---- */
   document.querySelectorAll('.acc-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
@@ -165,7 +240,7 @@
           // Happens when previewing the file locally, or if the network drops.
           // Never leave someone with a dead form — give them a direct route.
           say(
-            'We could not send that from here. Please email hello@takaya.om or message us on WhatsApp and we will pick it up straight away.',
+            'We could not send that from here. Please email takayaoman@gmail.com or message us on WhatsApp and we will pick it up straight away.',
             'error'
           );
         })
