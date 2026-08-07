@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>احجز — معهد تكايا، مسقط</title>
+<meta name="description" content="احجز مقعدًا في أحد برامج تكايا أو احجز مساحة تدريب — في أربع خطوات بسيطة.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Noto+Kufi+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="/index.html">
+      <img class="brand-mark" src="/assets/logo-mark.svg" alt="تكايا">
+      <span><span class="brand-text">تكايا</span><span class="brand-sub">مسقط</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/index.html">الرئيسية</a></li>
+      <li><a href="/book.html" aria-current="page">احجز</a></li>
+      <li><a href="/about.html">عن المعهد</a></li>
+      <li><a href="/contact.html">تواصل معنا</a></li>
+      <li><a class="btn btn-primary btn-sm" href="/book.html">احجز الآن</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a class="lang-switch" href="/en/index.html" hreflang="en" lang="en" aria-label="Switch to English">
+        <svg class="globe" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18"/></svg>
+        <span class="label">English</span>
+      </a>
+      <a class="btn btn-primary btn-sm" href="/book.html">احجز الآن</a>
+      <button class="nav-toggle" aria-expanded="false" aria-label="القائمة"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main>
+<section class="section-tight">
+  <div class="wrap narrow">
+    <div class="wizard" data-wizard>
+
+      <div class="wizard-progress">
+        <span class="active" data-step="1"></span>
+        <span data-step="2"></span>
+        <span data-step="3"></span>
+        <span data-step="4"></span>
+      </div>
+
+      <div class="wizard-step active" data-step="1">
+        <div class="wizard-head">
+          <span class="eyebrow">الحجز</span>
+          <h2>ماذا تودّ أن تحجز؟</h2>
+          <p>اختر برنامجًا أو مساحة، وسنرشدك للموعد المناسب.</p>
+        </div>
+        <div class="choice-grid">
+          <button type="button" class="choice-card" data-type="course">
+            <span class="choice-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5.5A2.5 2.5 0 016.5 3H20v15.5H6.5A2.5 2.5 0 004 21V5.5z"/><path d="M4 18.5A2.5 2.5 0 016.5 16H20"/></svg>
+            </span>
+            <h3>برنامج</h3>
+            <p>احجز مقعدًا في أحد برامج تكايا</p>
+          </button>
+          <button type="button" class="choice-card" data-type="space">
+            <span class="choice-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="17" rx="1.5"/><path d="M3 9h18M9 21V9"/></svg>
+            </span>
+            <h3>مساحة</h3>
+            <p>احجز قاعة تكايا للتدريب</p>
+          </button>
+        </div>
+      </div>
+
+      <div class="wizard-step" data-step="2">
+        <div class="wizard-head">
+          <span class="eyebrow" id="step2-eyebrow">البرامج</span>
+          <h2 id="step2-title">اختر البرنامج</h2>
+          <p>يمكنك دائمًا الرجوع لتغيير اختيارك.</p>
+        </div>
+        <div class="item-list" id="item-list"></div>
+      </div>
+
+      <div class="wizard-step" data-step="3">
+        <div class="wizard-head">
+          <span class="eyebrow">الموعد</span>
+          <h2>اختر يومًا ووقتًا</h2>
+          <p id="step3-sub"></p>
+        </div>
+        <div class="day-picker" id="day-picker"></div>
+        <div class="slot-grid" id="slot-grid"></div>
+      </div>
+
+      <div class="wizard-step" data-step="4">
+        <div class="wizard-head">
+          <span class="eyebrow">أخيرًا</span>
+          <h2>بياناتك</h2>
+          <p>سنؤكد حجزك فور استلام هذه البيانات.</p>
+        </div>
+        <div class="wizard-summary" id="summary"></div>
+        <div class="form-status" id="submit-status"></div>
+        <form id="booking-form">
+          <div class="field">
+            <label for="b-name">الاسم</label>
+            <input id="b-name" type="text" name="name" required minlength="2" autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="b-email">البريد الإلكتروني</label>
+            <input id="b-email" type="email" name="email" required autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="b-phone">رقم الهاتف</label>
+            <input id="b-phone" type="tel" name="phone" autocomplete="tel">
+          </div>
+          <input type="text" name="company_website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
+        </form>
+      </div>
+
+      <div class="wizard-step" data-step="5">
+        <div class="wizard-success">
+          <div class="check-circle" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <h2>تم تأكيد حجزك</h2>
+          <p>راسلناك بالتفاصيل. نراك قريبًا!</p>
+        </div>
+        <div class="wizard-summary" id="summary-final"></div>
+      </div>
+
+      <div class="wizard-nav" id="wizard-nav">
+        <button type="button" class="wizard-back" id="back-btn">رجوع</button>
+        <button type="button" class="btn btn-primary" id="next-btn" disabled>التالي</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-bottom" style="padding-top:0; border-top:none">
+      <span>&copy; <span data-year></span> معهد تكايا. جميع الحقوق محفوظة.</span>
+      <span><a href="/contact.html" style="color:#93A79D">تواصل معنا</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/main.js"></script>
+<script src="/assets/book.js"></script>
+</body>
+</html>
