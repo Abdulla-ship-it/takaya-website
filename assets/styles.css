@@ -4,25 +4,32 @@
    ============================================================ */
 
 /* ---------- 1. Tokens ---------- */
+/* Colours re-grounded in the Takaya brand guide: the deep zellige-tile
+   green, kraft-paper tan, mustard/gold glaze and slate-navy accent
+   sampled directly from the guide's photography, plus the logo's own
+   ink brown. */
 :root {
   /* Colour */
-  --ink:        #17201B;
-  --ink-soft:   #3D4A42;
-  --ink-mute:   #6E7A72;
-  --line:       #DFD8CB;
-  --line-soft:  #EDE7DC;
+  --ink:        #1B1712;
+  --ink-soft:   #4A3F34;
+  --ink-mute:   #7C7266;
+  --line:       #E2D3B8;
+  --line-soft:  #EEE3CC;
 
-  --cream:      #FBF8F2;
-  --sand:       #F3EEE4;
-  --stone:      #E8E1D4;
+  --cream:      #FBF6EC;
+  --sand:       #F2E6CE;
+  --stone:      #E6D2A8;
 
-  --green:      #24443A;
-  --green-deep: #16302A;
-  --green-soft: #3E6157;
+  --green:      #163625;
+  --green-deep: #0C2116;
+  --green-soft: #2F5A41;
 
-  --brass:      #B08D57;
-  --brass-deep: #96743F;
-  --brass-tint: #F0E6D5;
+  --brass:      #C79A5B;
+  --brass-deep: #A67D3F;
+  --brass-tint: #F1E3C8;
+
+  --navy:       #3B4F61;
+  --ink-brown:  #513829;
 
   /* Type */
   --display: "Fraunces", "Georgia", "Times New Roman", serif;
@@ -139,32 +146,52 @@ section { padding-block: var(--section); }
 .bg-green .muted { color: #92A39A; }
 
 /* ---------- 5. Buttons ---------- */
+/* Faceted "tile-chip" corners — a nod to the cut geometry of zellige
+   tilework in the brand guide — replace the plain rounded rectangle. */
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.55rem;
-  padding: 0.95rem 1.9rem;
+  padding: 0.95rem 2rem;
   font-size: 0.88rem;
   font-weight: 600;
   letter-spacing: 0.02em;
   text-decoration: none;
   border: 1px solid transparent;
-  border-radius: var(--radius);
-  transition: all 0.3s var(--ease);
+  clip-path: polygon(
+    16px 0, 100% 0, 100% calc(100% - 16px),
+    calc(100% - 16px) 100%, 0 100%, 0 16px
+  );
+  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease),
+    background 0.3s var(--ease), color 0.3s var(--ease);
   white-space: nowrap;
+}
+/* Thin inset keyline, like the grout line between glazed tiles —
+   sits just inside the cut corners on the filled variants. */
+.btn-primary::before,
+.btn-brass::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  clip-path: polygon(
+    13px 0, 100% 0, 100% calc(100% - 13px),
+    calc(100% - 13px) 100%, 0 100%, 0 13px
+  );
+  border: 1px solid rgba(251, 246, 236, 0.22);
+  pointer-events: none;
 }
 
 .btn-primary {
-  background: var(--green);
+  background: linear-gradient(155deg, var(--green-soft), var(--green) 55%, var(--green-deep));
   color: var(--cream);
-  border-color: var(--green);
+  border-color: var(--green-deep);
 }
 .btn-primary:hover {
-  background: var(--green-deep);
-  border-color: var(--green-deep);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 20px -8px rgba(23, 32, 27, 0.45);
+  background: linear-gradient(155deg, var(--green), var(--green-deep) 65%, #081409);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -10px rgba(12, 33, 22, 0.55);
 }
 
 .btn-ghost {
@@ -173,34 +200,51 @@ section { padding-block: var(--section); }
   border-color: var(--line);
 }
 .btn-ghost:hover {
-  border-color: var(--ink);
-  background: rgba(23, 32, 27, 0.03);
+  border-color: var(--ink-brown);
+  color: var(--ink-brown);
+  background: rgba(81, 56, 41, 0.05);
+  transform: translateY(-2px);
 }
 
 .btn-brass {
-  background: var(--brass);
-  color: #1B1408;
-  border-color: var(--brass);
+  background: linear-gradient(155deg, #DBB077, var(--brass) 55%, var(--brass-deep));
+  color: #241B0C;
+  border-color: var(--brass-deep);
 }
 .btn-brass:hover {
-  background: var(--brass-deep);
-  border-color: var(--brass-deep);
+  background: linear-gradient(155deg, var(--brass), var(--brass-deep) 65%, #6E541F);
   color: var(--cream);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -10px rgba(102, 74, 27, 0.55);
 }
 
 .btn-light {
   background: transparent;
   color: var(--cream);
-  border-color: rgba(251, 248, 242, 0.32);
+  border-color: rgba(251, 246, 236, 0.32);
 }
 .btn-light:hover {
   background: var(--cream);
   color: var(--green-deep);
   border-color: var(--cream);
+  transform: translateY(-2px);
 }
 
-.btn-sm { padding: 0.6rem 1.15rem; font-size: 0.8rem; }
+.btn-sm {
+  padding: 0.6rem 1.25rem;
+  font-size: 0.8rem;
+  clip-path: polygon(
+    11px 0, 100% 0, 100% calc(100% - 11px),
+    calc(100% - 11px) 100%, 0 100%, 0 11px
+  );
+}
+.btn-sm.btn-primary::before, .btn-sm.btn-brass::before {
+  inset: 2px;
+  clip-path: polygon(
+    9px 0, 100% 0, 100% calc(100% - 9px),
+    calc(100% - 9px) 100%, 0 100%, 0 9px
+  );
+}
 
 /* Text link with underline reveal */
 .tlink {
