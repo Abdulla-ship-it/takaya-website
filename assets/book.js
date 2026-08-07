@@ -1,8 +1,7 @@
 /* ============================================================
    TAKAYA — booking wizard
-   Placeholder catalogue below (marked TEST DATA) — swap in the
-   real programmes/spaces and swap the mock slot generator for a
-   live Cal.com embed once that's connected.
+   Real availability comes from Cal.com via /api/slots and /api/book
+   (Cloudflare Pages Functions) — the API key never reaches this file.
    ============================================================ */
 (function () {
   'use strict';
@@ -10,14 +9,14 @@
   var root = document.querySelector('[data-wizard]');
   if (!root) return;
 
-  /* ---- TEST DATA — replace with real programmes / spaces ---- */
   var CATALOGUE = {
     course: [
       {
         id: 'tamkeen',
         name: 'برنامج تمكين',
         desc: 'جلسة تعريفية لاكتشاف البرنامج قبل الالتحاق.',
-        meta: '٦٠ دقيقة'
+        meta: '٦٠ دقيقة',
+        eventTypeId: 6594286
       }
     ],
     space: [
@@ -25,42 +24,31 @@
         id: 'training-room',
         name: 'قاعة تكايا للتدريب',
         desc: 'قاعة مجهزة داخل مقر تكايا بمسقط.',
-        meta: 'حتى ساعتين'
+        meta: '٦٠ دقيقة',
+        eventTypeId: 6594267
       }
     ]
   };
 
   var TYPE_LABEL = { course: 'برنامج', space: 'مساحة' };
-  var TIME_SLOTS = ['09:00', '10:30', '12:00', '14:00', '16:00', '17:30'];
   var DOW_SHORT = ['أحد', 'إثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت'];
   var ARABIC_DIGITS = '٠١٢٣٤٥٦٧٨٩';
+  var TIME_ZONE = 'Asia/Muscat';
 
   function toArabicDigits(n) {
     return String(n).replace(/[0-9]/g, function (d) { return ARABIC_DIGITS[d]; });
   }
 
-  /* Deterministic pseudo-random so the same date always shows the
-     same "booked" slots instead of flickering on re-render. */
-  function seeded(str) {
-    var h = 0;
-    for (var i = 0; i < str.length; i++) { h = (h * 31 + str.charCodeAt(i)) >>> 0; }
-    return function () { h = (h * 1103515245 + 12345) >>> 0; return (h >>> 8) / 16777216; };
+  function timeLabel(iso) {
+    return new Date(iso).toLocaleTimeString('en-GB', {
+      timeZone: TIME_ZONE,
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
   }
 
-  function workingDays(count) {
-    var days = [];
-    var d = new Date();
-    d.setHours(0, 0, 0, 0);
-    d.setDate(d.getDate() + 1);
-    while (days.length < count) {
-      var dow = d.getDay();
-      if (dow !== 5 && dow !== 6) { days.push(new Date(d)); }
-      d.setDate(d.getDate() + 1);
-    }
-    return days;
-  }
-
-  var state = { step: 1, type: null, item: null, date: null, time: null };
+  var state = { step: 1, type: null, item: null, slotsByDate: null, date: null, slotIso: null };
 
   var steps = root.querySelectorAll('.wizard-step');
   var progressDots = root.querySelectorAll('.wizard-progress span');
@@ -77,8 +65,10 @@
   var form = root.querySelector('#booking-form');
   var submitStatus = root.querySelector('#submit-status');
 
-  function fmtDate(d) {
-    return d.toLocaleDateString('ar-OM', { weekday: 'long', day: 'numeric', month: 'long' });
+  function fmtDate(iso) {
+    return new Date(iso).toLocaleDateString('ar-OM', {
+      timeZone: TIME_ZONE, weekday: 'long', day: 'numeric', month: 'long'
+    });
   }
 
   function render() {
@@ -102,7 +92,7 @@
     var ok = true;
     if (state.step === 1) ok = !!state.type;
     if (state.step === 2) ok = !!state.item;
-    if (state.step === 3) ok = !!(state.date && state.time);
+    if (state.step === 3) ok = !!(state.date && state.slotIso);
     if (state.step === 4) ok = form.checkValidity();
     nextBtn.disabled = !ok;
     nextBtn.style.opacity = ok ? '1' : '0.55';
@@ -143,50 +133,76 @@
     }
   }
 
-  function populateDays() {
-    var days = workingDays(6);
+  function loadSlots() {
+    state.slotsByDate = null;
+    state.date = null;
+    state.slotIso = null;
     dayPickerEl.innerHTML = '';
-    days.forEach(function (d, i) {
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'day-pill';
-      btn.innerHTML =
-        '<span class="dow">' + DOW_SHORT[d.getDay()] + '</span>' +
-        '<span class="dom">' + toArabicDigits(d.getDate()) + '</span>';
-      btn.addEventListener('click', function () {
-        state.date = d;
-        state.time = null;
-        dayPickerEl.querySelectorAll('.day-pill').forEach(function (p) { p.classList.remove('selected'); });
-        btn.classList.add('selected');
-        populateSlots();
-        updateNextEnabled();
-      });
-      dayPickerEl.appendChild(btn);
-      if (i === 0) btn.click();
-    });
+    slotGridEl.innerHTML = '<p class="muted" style="font-size:0.88rem">جارٍ تحميل المواعيد المتاحة…</p>';
     step3Sub.textContent = state.item ? state.item.name + ' — اختر الموعد الأنسب' : '';
+
+    var url = '/api/slots?eventTypeId=' + encodeURIComponent(state.item.eventTypeId) +
+      '&timeZone=' + encodeURIComponent(TIME_ZONE);
+
+    fetch(url)
+      .then(function (res) { return res.json().catch(function () { return {}; }); })
+      .then(function (body) {
+        if (!body || !body.ok) throw new Error((body && body.error) || 'failed');
+        state.slotsByDate = body.slots || {};
+        var dates = Object.keys(state.slotsByDate).filter(function (d) {
+          return (state.slotsByDate[d] || []).length > 0;
+        }).sort();
+
+        if (!dates.length) {
+          slotGridEl.innerHTML = '';
+          dayPickerEl.innerHTML = '<p class="muted" style="font-size:0.88rem">لا توجد مواعيد متاحة في الأيام القادمة حاليًا. تواصل معنا مباشرة لتنسيق موعد.</p>';
+          return;
+        }
+
+        dayPickerEl.innerHTML = '';
+        dates.forEach(function (dateKey, i) {
+          var d = new Date(dateKey + 'T00:00:00');
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'day-pill';
+          btn.innerHTML =
+            '<span class="dow">' + DOW_SHORT[d.getDay()] + '</span>' +
+            '<span class="dom">' + toArabicDigits(d.getDate()) + '</span>';
+          btn.addEventListener('click', function () {
+            state.date = dateKey;
+            state.slotIso = null;
+            dayPickerEl.querySelectorAll('.day-pill').forEach(function (p) { p.classList.remove('selected'); });
+            btn.classList.add('selected');
+            populateSlots();
+            updateNextEnabled();
+          });
+          dayPickerEl.appendChild(btn);
+          if (i === 0) btn.click();
+        });
+      })
+      .catch(function () {
+        dayPickerEl.innerHTML = '';
+        slotGridEl.innerHTML = '';
+        step3Sub.innerHTML = '<span style="color:#8A3B22">تعذّر تحميل المواعيد المتاحة الآن. تواصل معنا مباشرة لتنسيق موعد.</span>';
+      });
   }
 
   function populateSlots() {
     slotGridEl.innerHTML = '';
-    if (!state.date) return;
-    var rand = seeded(state.date.toDateString());
-    TIME_SLOTS.forEach(function (t) {
-      var taken = rand() < 0.25;
+    var daySlots = (state.slotsByDate && state.slotsByDate[state.date]) || [];
+    daySlots.forEach(function (s) {
+      var iso = typeof s === 'string' ? s : (s.start || s.time);
+      if (!iso) return;
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'slot-btn';
-      btn.textContent = t;
-      if (taken) {
-        btn.disabled = true;
-      } else {
-        btn.addEventListener('click', function () {
-          state.time = t;
-          slotGridEl.querySelectorAll('.slot-btn').forEach(function (s) { s.classList.remove('selected'); });
-          btn.classList.add('selected');
-          updateNextEnabled();
-        });
-      }
+      btn.textContent = timeLabel(iso);
+      btn.addEventListener('click', function () {
+        state.slotIso = iso;
+        slotGridEl.querySelectorAll('.slot-btn').forEach(function (b) { b.classList.remove('selected'); });
+        btn.classList.add('selected');
+        updateNextEnabled();
+      });
       slotGridEl.appendChild(btn);
     });
   }
@@ -196,8 +212,8 @@
       '<dl>' +
       '<dt>النوع</dt><dd>' + TYPE_LABEL[state.type] + '</dd>' +
       '<dt>الاختيار</dt><dd>' + state.item.name + '</dd>' +
-      '<dt>التاريخ</dt><dd>' + fmtDate(state.date) + '</dd>' +
-      '<dt>الوقت</dt><dd class="ltr">' + state.time + '</dd>' +
+      '<dt>التاريخ</dt><dd>' + fmtDate(state.slotIso) + '</dd>' +
+      '<dt>الوقت</dt><dd class="ltr">' + timeLabel(state.slotIso) + '</dd>' +
       '</dl>'
     );
   }
@@ -216,7 +232,7 @@
 
     state.step += 1;
     if (state.step === 2) populateItems();
-    if (state.step === 3) populateDays();
+    if (state.step === 3) loadSlots();
     render();
   }
 
@@ -235,16 +251,15 @@
     submitStatus.classList.remove('show', 'error');
 
     var payload = {
+      eventTypeId: state.item.eventTypeId,
+      start: state.slotIso,
       name: data.name,
       email: data.email,
       phone: data.phone,
-      interest: state.item.name,
-      format: state.type === 'course' ? 'حجز برنامج' : 'حجز مساحة',
-      language: 'ar',
-      message: 'حجز: ' + state.item.name + ' — ' + fmtDate(state.date) + ' الساعة ' + state.time
+      timeZone: TIME_ZONE
     };
 
-    fetch('/api/enquiry', {
+    fetch('/api/book', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -256,11 +271,13 @@
           state.step = 5;
           render();
         } else {
-          throw new Error('failed');
+          throw new Error((body && body.error) || 'failed');
         }
       })
-      .catch(function () {
-        submitStatus.textContent = 'تعذّر إرسال الحجز من هنا. راسلنا على واتساب أو بريدنا الإلكتروني وسنؤكد حجزك يدويًا.';
+      .catch(function (err) {
+        submitStatus.textContent = (err && err.message && /no longer be available/i.test(err.message))
+          ? 'هذا الموعد لم يعد متاحًا. الرجاء اختيار موعد آخر.'
+          : 'تعذّر إرسال الحجز من هنا. راسلنا على واتساب أو بريدنا الإلكتروني وسنؤكد حجزك يدويًا.';
         submitStatus.classList.add('show', 'error');
       })
       .then(function () {
