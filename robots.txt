@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+# Update this once the custom domain is live
+Sitemap: https://takaya.om/sitemap.xml
