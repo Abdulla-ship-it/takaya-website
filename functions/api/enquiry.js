@@ -128,7 +128,7 @@ export async function onRequestPost({ request, env }) {
       ['Country', enquiry.country],
     ]
       .filter(([, v]) => v)
-      .map(([k, v]) => `<tr><td style="padding:4px 14px 4px 0;color:#6E7A72">${k}</td><td style="padding:4px 0"><strong>${escapeHtml(v)}</strong></td></tr>`)
+      .map(([k, v]) => `<tr><td style="padding:4px 14px 4px 0;color:#7F7050">${k}</td><td style="padding:4px 0"><strong>${escapeHtml(v)}</strong></td></tr>`)
       .join('');
 
     try {
@@ -144,11 +144,11 @@ export async function onRequestPost({ request, env }) {
           reply_to: enquiry.email,
           subject: `New enquiry — ${enquiry.interest || 'General'} — ${enquiry.name}`,
           html: `
-            <div style="font-family:system-ui,-apple-system,sans-serif;color:#17201B;max-width:560px">
+            <div style="font-family:system-ui,-apple-system,sans-serif;color:#2B1D12;max-width:560px">
               <h2 style="margin:0 0 18px;font-weight:500">New website enquiry</h2>
               <table style="font-size:14px;border-collapse:collapse">${rows}</table>
-              ${enquiry.message ? `<p style="margin:22px 0 6px;color:#6E7A72;font-size:12px;text-transform:uppercase;letter-spacing:.1em">Message</p><p style="font-size:14px;line-height:1.6;white-space:pre-wrap">${escapeHtml(enquiry.message)}</p>` : ''}
-              <p style="margin-top:26px;font-size:12px;color:#9AA5A0">Received ${enquiry.submitted_at}</p>
+              ${enquiry.message ? `<p style="margin:22px 0 6px;color:#7F7050;font-size:12px;text-transform:uppercase;letter-spacing:.1em">Message</p><p style="font-size:14px;line-height:1.6;white-space:pre-wrap">${escapeHtml(enquiry.message)}</p>` : ''}
+              <p style="margin-top:26px;font-size:12px;color:#B89F7C">Received ${enquiry.submitted_at}</p>
             </div>`,
         }),
       });
