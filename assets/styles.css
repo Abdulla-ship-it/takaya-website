@@ -4,10 +4,9 @@
    ============================================================ */
 
 /* ---------- 1. Tokens ---------- */
-/* Colours taken directly from the official Takaya visual identity guide:
-   #9D6545 (rust brown), #8C5F37 (deep brown), #BA9E81 (tan), #7F7050
-   (muted brown-grey) and #F6EBD0 (cream). Every accent below resolves to
-   one of these five — no green, no navy, no gold outside the guide. */
+/* Colours updated to match the current live brand identity (Instagram
+   @takaya.om): #5C865E sage green + #F6EBD0 cream, with the earlier
+   guide's cream/tan/stone neutrals retained as supporting warm neutrals. */
 :root {
   /* Colour */
   --ink:        #2B1D12;
@@ -20,16 +19,16 @@
   --sand:       #E9DAB8;
   --stone:      #BA9E81;
 
-  --green:      #9D6545;
-  --green-deep: #8C5F37;
-  --green-soft: #BA9E81;
+  --green:      #5C865E;
+  --green-deep: #456446;
+  --green-soft: #9DB69E;
 
-  --brass:      #8C5F37;
-  --brass-deep: #7F7050;
+  --brass:      #456446;
+  --brass-deep: #324933;
   --brass-tint: #F6EBD0;
 
   --navy:       #7F7050;
-  --ink-brown:  #8C5F37;
+  --ink-brown:  #456446;
 
   /* Type */
   --display: "Fraunces", "Georgia", "Times New Roman", serif;
@@ -191,13 +190,13 @@ section { padding-block: var(--section); }
 }
 
 .btn-primary {
-  background: linear-gradient(155deg, var(--green), var(--green-deep) 55%, #3A2515);
+  background: linear-gradient(155deg, #577F59, var(--green-deep) 55%, #202E20);
   color: #fff;
   border-color: var(--green-deep);
   box-shadow: 0 6px 16px -10px rgba(43, 29, 18, 0.45);
 }
 .btn-primary:hover {
-  background: linear-gradient(155deg, var(--green-deep), #3A2515 70%, #2B1D12);
+  background: linear-gradient(155deg, var(--green-deep), #202E20 70%, #141F15);
   transform: translateY(-2px);
   box-shadow: 0 10px 22px -10px rgba(43, 29, 18, 0.55);
 }
@@ -210,18 +209,18 @@ section { padding-block: var(--section); }
 .btn-ghost:hover {
   border-color: var(--ink-brown);
   color: var(--ink-brown);
-  background: rgba(140, 95, 55, 0.06);
+  background: rgba(69, 100, 70, 0.06);
   transform: translateY(-2px);
 }
 
 .btn-brass {
-  background: linear-gradient(155deg, var(--brass-deep), #5C4326 60%, #3A2515);
+  background: linear-gradient(155deg, var(--brass-deep), #26372A 60%, #202E20);
   color: #fff;
   border-color: var(--brass-deep);
   box-shadow: 0 6px 16px -10px rgba(43, 29, 18, 0.4);
 }
 .btn-brass:hover {
-  background: linear-gradient(155deg, #5C4326, #3A2515 65%, #2B1D12);
+  background: linear-gradient(155deg, #26372A, #202E20 65%, #141F15);
   color: #fff;
   transform: translateY(-2px);
   box-shadow: 0 10px 22px -10px rgba(43, 29, 18, 0.5);
@@ -403,7 +402,7 @@ section { padding-block: var(--section); }
   top: -22%; right: -12%;
   width: min(760px, 68vw);
   aspect-ratio: 1;
-  background: radial-gradient(circle at 45% 45%, rgba(157,101,69,0.16), rgba(157,101,69,0) 62%);
+  background: radial-gradient(circle at 45% 45%, rgba(92,134,94,0.16), rgba(92,134,94,0) 62%);
   pointer-events: none;
   z-index: 0;
 }
@@ -490,7 +489,7 @@ section { padding-block: var(--section); }
 .course-card .price {
   font-family: var(--display);
   font-size: 1.3rem;
-  color: var(--green);
+  color: var(--green-deep);
 }
 .course-card .price small {
   font-family: var(--body);
@@ -517,7 +516,7 @@ section { padding-block: var(--section); }
   margin-bottom: 1.1rem;
   align-self: flex-start;
 }
-.tag-green { background: #fff; color: var(--green); }
+.tag-green { background: #fff; color: var(--green-deep); }
 .tag-stone { background: var(--stone); color: var(--ink); }
 
 .meta-row {
@@ -563,7 +562,7 @@ section { padding-block: var(--section); }
 .ribbon {
   position: absolute;
   top: -1px; right: 1.8rem;
-  background: var(--green);
+  background: var(--green-deep);
   color: var(--cream);
   font-size: 0.66rem;
   font-weight: 600;
@@ -695,9 +694,9 @@ section { padding-block: var(--section); }
 .field textarea:focus {
   outline: none;
   border-color: var(--green);
-  box-shadow: 0 0 0 3px rgba(157, 101, 69, 0.14);
+  box-shadow: 0 0 0 3px rgba(92, 134, 94, 0.14);
 }
-.field select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237F7050' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.6rem; }
+.field select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23456446' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.6rem; }
 
 .form-note { font-size: 0.82rem; color: var(--ink-mute); margin-top: 1rem; }
 
@@ -747,8 +746,8 @@ button[disabled] { opacity: 0.6; cursor: not-allowed; }
 }
 .filter-btn:hover { border-color: var(--ink-mute); color: var(--ink); }
 .filter-btn.active {
-  background: var(--green);
-  border-color: var(--green);
+  background: var(--green-deep);
+  border-color: var(--green-deep);
   color: #fff;
 }
 
@@ -899,7 +898,7 @@ button[disabled] { opacity: 0.6; cursor: not-allowed; }
 .lang-switch:hover {
   color: var(--ink-brown);
   border-color: var(--green);
-  background: rgba(157, 101, 69, 0.06);
+  background: rgba(92, 134, 94, 0.06);
 }
 .lang-switch .globe { flex-shrink: 0; opacity: 0.65; }
 .lang-switch:hover .globe { opacity: 1; }
@@ -1045,7 +1044,7 @@ button[disabled] { opacity: 0.6; cursor: not-allowed; }
 }
 .day-pill .dow { display: block; font-size: 0.66rem; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.05em; }
 .day-pill .dom { display: block; font-size: 1.05rem; font-family: var(--display); color: var(--ink); margin-top: 0.15rem; }
-.day-pill.selected { border-color: var(--green); background: var(--green); }
+.day-pill.selected { border-color: var(--green-deep); background: var(--green-deep); }
 .day-pill.selected .dow, .day-pill.selected .dom { color: #fff; }
 
 .slot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
@@ -1055,7 +1054,7 @@ button[disabled] { opacity: 0.6; cursor: not-allowed; }
   background: #fff; cursor: pointer; font-family: inherit;
 }
 .slot-btn:hover:not(:disabled) { border-color: var(--green); }
-.slot-btn.selected { border-color: var(--green); background: var(--green); color: #fff; }
+.slot-btn.selected { border-color: var(--green-deep); background: var(--green-deep); color: #fff; }
 .slot-btn:disabled { opacity: 0.35; cursor: not-allowed; text-decoration: line-through; }
 
 .wizard-summary { background: #fff; border: 1px solid var(--line-soft); border-radius: var(--radius-lg); padding: 1.5rem 1.75rem; margin-bottom: 1.75rem; }
