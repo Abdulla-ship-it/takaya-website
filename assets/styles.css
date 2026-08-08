@@ -336,6 +336,12 @@ section { padding-block: var(--section); }
   padding-block: 0.4rem;
   transition: color 0.25s var(--ease);
 }
+/* Buttons living inside nav-links (shown on mobile) must keep their own
+   button text colour — .nav-links a alone would otherwise out-specificity
+   .btn-primary/.btn-brass and paint dark text on a dark gradient. */
+.nav-links a.btn { color: #fff; padding-block: 0; }
+.nav-links a.btn:hover { color: #fff; }
+.nav-links a.btn::after { display: none; }
 .nav-links a::after {
   content: "";
   position: absolute;
