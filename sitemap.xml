@@ -28,6 +28,27 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://takaya.om/spaces.html</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://takaya.om/spaces.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://takaya.om/en/spaces.html"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://takaya.om/individual-training.html</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://takaya.om/individual-training.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://takaya.om/en/individual-training.html"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://takaya.om/membership.html</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://takaya.om/membership.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://takaya.om/en/membership.html"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://takaya.om/about.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
@@ -53,6 +74,21 @@
     <loc>https://takaya.om/en/coaching.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://takaya.om/en/spaces.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://takaya.om/en/individual-training.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://takaya.om/en/membership.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://takaya.om/en/about.html</loc>
