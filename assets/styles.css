@@ -679,6 +679,14 @@ section { padding-block: var(--section); }
   color: var(--ink-mute);
   margin-bottom: 0.55rem;
 }
+/* Compulsory-field marker — added automatically to any field whose input
+   is required, so new required fields never need a manual asterisk. */
+.field:has(input:required) label::after,
+.field:has(select:required) label::after,
+.field:has(textarea:required) label::after {
+  content: " *";
+  color: #8A3B22;
+}
 .field input,
 .field select,
 .field textarea {
