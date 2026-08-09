@@ -64,6 +64,10 @@
   var summaryFinalEl = root.querySelector('#summary-final');
   var form = root.querySelector('#booking-form');
   var submitStatus = root.querySelector('#submit-status');
+  var slipInput = root.querySelector('#b-slip');
+  var slipHint = root.querySelector('#slip-hint');
+  var slipHintDefault = slipHint ? slipHint.textContent : '';
+  var MAX_SLIP_BYTES = 4 * 1024 * 1024;
 
   function fmtDate(iso) {
     return new Date(iso).toLocaleDateString('ar-OM', {
@@ -96,6 +100,42 @@
     if (state.step === 4) ok = form.checkValidity();
     nextBtn.disabled = !ok;
     nextBtn.style.opacity = ok ? '1' : '0.55';
+  }
+
+  var SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'application/pdf'];
+
+  function validateSlip() {
+    if (!slipInput) return;
+    var field = slipInput.closest('.field');
+    var file = slipInput.files && slipInput.files[0];
+    var msg = '';
+
+    if (file) {
+      if (file.size > MAX_SLIP_BYTES) {
+        msg = 'حجم الملف كبير — الحد الأقصى 4 ميجابايت.';
+      } else if (SLIP_TYPES.indexOf(file.type) === -1) {
+        msg = 'الرجاء رفع صورة (PNG/JPEG/WEBP) أو ملف PDF.';
+      }
+    }
+
+    slipInput.setCustomValidity(msg);
+    if (field) field.classList.toggle('invalid', !!msg);
+    if (slipHint) slipHint.textContent = msg || slipHintDefault;
+  }
+
+  function readSlipAsBase64() {
+    var file = slipInput && slipInput.files && slipInput.files[0];
+    if (!file) return Promise.resolve(null);
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () {
+        var result = String(reader.result || '');
+        var base64 = result.slice(result.indexOf(',') + 1);
+        resolve({ filename: file.name, type: file.type, dataBase64: base64 });
+      };
+      reader.onerror = function () { reject(new Error('file-read-failed')); };
+      reader.readAsDataURL(file);
+    });
   }
 
   function selectType(type) {
@@ -246,28 +286,40 @@
     var data = Object.fromEntries(new FormData(form).entries());
     if (data.company_website) return; // honeypot
 
+    validateSlip();
+    if (!form.checkValidity()) {
+      updateNextEnabled();
+      return;
+    }
+
     nextBtn.disabled = true;
-    nextBtn.textContent = 'جارٍ الإرسال…';
+    nextBtn.textContent = 'جارٍ رفع الإيصال…';
     submitStatus.classList.remove('show', 'error');
 
-    var payload = {
-      eventTypeId: state.item.eventTypeId,
-      start: state.slotIso,
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-      timeZone: TIME_ZONE
-    };
-
-    fetch('/api/book', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
+    readSlipAsBase64()
+      .then(function (slip) {
+        nextBtn.textContent = 'جارٍ الإرسال…';
+        var payload = {
+          eventTypeId: state.item.eventTypeId,
+          start: state.slotIso,
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          timeZone: TIME_ZONE,
+          slip: slip
+        };
+        return fetch('/api/book', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      })
       .then(function (res) { return res.json().catch(function () { return {}; }); })
       .then(function (body) {
         if (body && body.ok) {
           summaryFinalEl.innerHTML = summaryRows();
+          var slipWarning = root.querySelector('#slip-warning');
+          if (slipWarning) slipWarning.classList.toggle('show', body.slipDelivered === false);
           state.step = 5;
           render();
         } else {
@@ -277,7 +329,9 @@
       .catch(function (err) {
         submitStatus.textContent = (err && err.message && /no longer be available/i.test(err.message))
           ? 'هذا الموعد لم يعد متاحًا. الرجاء اختيار موعد آخر.'
-          : 'تعذّر إرسال الحجز من هنا. راسلنا على واتساب أو بريدنا الإلكتروني وسنؤكد حجزك يدويًا.';
+          : (err && err.message === 'file-read-failed')
+            ? 'تعذّر قراءة ملف الإيصال. جرّب ملفًا آخر.'
+            : 'تعذّر إرسال الحجز من هنا. راسلنا على واتساب أو بريدنا الإلكتروني وسنؤكد حجزك يدويًا.';
         submitStatus.classList.add('show', 'error');
       })
       .then(function () {
@@ -294,6 +348,12 @@
   backBtn.addEventListener('click', goBack);
   form.addEventListener('submit', function (e) { e.preventDefault(); });
   form.addEventListener('input', updateNextEnabled);
+  if (slipInput) {
+    slipInput.addEventListener('change', function () {
+      validateSlip();
+      updateNextEnabled();
+    });
+  }
 
   var params = new URLSearchParams(window.location.search);
   var presetType = params.get('type');

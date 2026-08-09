@@ -112,7 +112,14 @@
           </div>
           <div class="field">
             <label for="b-phone">رقم الهاتف</label>
-            <input id="b-phone" type="tel" name="phone" autocomplete="tel">
+            <input id="b-phone" type="tel" name="phone" required minlength="6" autocomplete="tel">
+          </div>
+          <div class="field">
+            <label for="b-slip">إيصال التحويل</label>
+            <div class="file-field">
+              <input id="b-slip" type="file" name="slip" required accept="image/png,image/jpeg,image/webp,application/pdf">
+              <p class="file-field-hint" id="slip-hint">صورة أو ملف PDF لإيصال السداد — حتى 4 ميجابايت</p>
+            </div>
           </div>
           <input type="text" name="company_website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
         </form>
@@ -127,6 +134,7 @@
           <p>راسلناك بالتفاصيل. نراك قريبًا!</p>
         </div>
         <div class="wizard-summary" id="summary-final"></div>
+        <p class="form-status error" id="slip-warning">تم تأكيد حجزك، لكن تعذّر استلام إيصال التحويل تلقائيًا. الرجاء إرساله عبر واتساب أو البريد الإلكتروني.</p>
       </div>
 
       <div class="wizard-nav" id="wizard-nav">
