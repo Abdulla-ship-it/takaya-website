@@ -310,7 +310,7 @@ section { padding-block: var(--section); }
   text-decoration: none;
   flex-shrink: 0;
 }
-.brand-mark { height: 46px; width: auto; flex-shrink: 0; }
+.brand-mark { height: 70px; width: auto; flex-shrink: 0; }
 .brand-text {
   font-family: var(--display);
   font-size: 1.42rem;
