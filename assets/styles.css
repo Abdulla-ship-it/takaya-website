@@ -23,6 +23,13 @@
   --green-deep: #456446;
   --green-soft: #9DB69E;
 
+  /* Slate blue — sampled from the "برنامج تمكين" Instagram post background,
+     added alongside the green/cream already in use. --slate-deep is a
+     darkened, AA-safe (4.82:1 on white) variant for text/icon use. */
+  --slate:      #889AB2;
+  --slate-deep: #667385;
+  --slate-tint: #EEF1F4;
+
   --brass:      #456446;
   --brass-deep: #324933;
   --brass-tint: #F6EBD0;
@@ -522,6 +529,7 @@ section { padding-block: var(--section); }
 }
 .tag-green { background: #fff; color: var(--green-deep); }
 .tag-stone { background: var(--stone); color: var(--ink); }
+.tag-blue { background: #fff; color: var(--slate-deep); }
 
 .meta-row {
   display: flex;
@@ -1056,6 +1064,11 @@ button[disabled] { opacity: 0.6; cursor: not-allowed; }
   display: flex; align-items: center; justify-content: center;
   color: var(--green);
 }
+/* The hall/space booking gets its own accent (slate blue) so the two
+   choices on step 1 read as visually distinct at a glance. */
+.choice-card[data-type="space"] .choice-icon { color: var(--slate-deep); }
+.choice-card[data-type="space"]:hover { border-color: var(--slate-deep); }
+.choice-card[data-type="space"].selected { border-color: var(--slate-deep); background: var(--slate-tint); }
 .choice-card h3 { margin-bottom: 0.3rem; font-size: 1.05rem; }
 .choice-card p { font-size: 0.84rem; color: var(--ink-mute); margin: 0; }
 
