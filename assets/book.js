@@ -24,8 +24,9 @@
         id: 'training-room',
         name: 'قاعة تكايا للتدريب',
         desc: 'قاعة مجهزة داخل مقر تكايا بمسقط.',
-        meta: '٦٠ دقيقة',
-        eventTypeId: 6594267
+        meta: 'من ساعة حتى ٣ ساعات',
+        eventTypeId: 6594267,
+        durations: [60, 120, 180]
       }
     ]
   };
@@ -39,6 +40,14 @@
     return String(n).replace(/[0-9]/g, function (d) { return ARABIC_DIGITS[d]; });
   }
 
+  function formatDuration(mins) {
+    var hrs = mins / 60;
+    if (hrs === 1) return 'ساعة واحدة';
+    if (hrs === 2) return 'ساعتان';
+    if (Number.isInteger(hrs)) return toArabicDigits(hrs) + ' ساعات';
+    return toArabicDigits(mins) + ' دقيقة';
+  }
+
   function timeLabel(iso) {
     return new Date(iso).toLocaleTimeString('en-GB', {
       timeZone: TIME_ZONE,
@@ -48,13 +57,14 @@
     });
   }
 
-  var state = { step: 1, type: null, item: null, slotsByDate: null, date: null, slotIso: null };
+  var state = { step: 1, type: null, item: null, duration: null, slotsByDate: null, date: null, slotIso: null };
 
   var steps = root.querySelectorAll('.wizard-step');
   var progressDots = root.querySelectorAll('.wizard-progress span');
   var nextBtn = root.querySelector('#next-btn');
   var backBtn = root.querySelector('#back-btn');
   var itemListEl = root.querySelector('#item-list');
+  var durationPickerEl = root.querySelector('#duration-picker');
   var step2Eyebrow = root.querySelector('#step2-eyebrow');
   var step2Title = root.querySelector('#step2-title');
   var dayPickerEl = root.querySelector('#day-picker');
@@ -95,7 +105,7 @@
   function updateNextEnabled() {
     var ok = true;
     if (state.step === 1) ok = !!state.type;
-    if (state.step === 2) ok = !!state.item;
+    if (state.step === 2) ok = !!state.item && !!state.duration;
     if (state.step === 3) ok = !!(state.date && state.slotIso);
     if (state.step === 4) ok = form.checkValidity();
     nextBtn.disabled = !ok;
@@ -147,6 +157,35 @@
     updateNextEnabled();
   }
 
+  function renderDurationPicker(item) {
+    durationPickerEl.innerHTML = '';
+    if (!item.durations || item.durations.length < 2) {
+      state.duration = (item.durations && item.durations[0]) || 60;
+      return;
+    }
+    state.duration = null;
+    var label = document.createElement('p');
+    label.className = 'duration-label';
+    label.textContent = 'المدة المطلوبة';
+    var row = document.createElement('div');
+    row.className = 'duration-row';
+    item.durations.forEach(function (mins) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'duration-pill';
+      btn.textContent = formatDuration(mins);
+      btn.addEventListener('click', function () {
+        state.duration = mins;
+        row.querySelectorAll('.duration-pill').forEach(function (b) { b.classList.remove('selected'); });
+        btn.classList.add('selected');
+        updateNextEnabled();
+      });
+      row.appendChild(btn);
+    });
+    durationPickerEl.appendChild(label);
+    durationPickerEl.appendChild(row);
+  }
+
   function populateItems() {
     var items = CATALOGUE[state.type] || [];
     step2Eyebrow.textContent = TYPE_LABEL[state.type];
@@ -164,6 +203,7 @@
         state.item = item;
         itemListEl.querySelectorAll('.item-card').forEach(function (c) { c.classList.remove('selected'); });
         btn.classList.add('selected');
+        renderDurationPicker(item);
         updateNextEnabled();
       });
       itemListEl.appendChild(btn);
@@ -183,6 +223,7 @@
 
     var url = '/api/slots?eventTypeId=' + encodeURIComponent(state.item.eventTypeId) +
       '&timeZone=' + encodeURIComponent(TIME_ZONE);
+    if (state.duration) url += '&duration=' + encodeURIComponent(state.duration);
 
     fetch(url)
       .then(function (res) { return res.json().catch(function () { return {}; }); })
@@ -248,10 +289,14 @@
   }
 
   function summaryRows() {
+    var durationRow = (state.item.durations && state.item.durations.length > 1)
+      ? '<dt>المدة</dt><dd>' + formatDuration(state.duration) + '</dd>'
+      : '';
     return (
       '<dl>' +
       '<dt>النوع</dt><dd>' + TYPE_LABEL[state.type] + '</dd>' +
       '<dt>الاختيار</dt><dd>' + state.item.name + '</dd>' +
+      durationRow +
       '<dt>التاريخ</dt><dd>' + fmtDate(state.slotIso) + '</dd>' +
       '<dt>الوقت</dt><dd class="ltr">' + timeLabel(state.slotIso) + '</dd>' +
       '</dl>'
@@ -308,6 +353,7 @@
           timeZone: TIME_ZONE,
           slip: slip
         };
+        if (state.duration) payload.lengthInMinutes = state.duration;
         return fetch('/api/book', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

@@ -9,7 +9,13 @@
  *
  * The booker must also attach a payment slip (image or PDF, ≤4MB), sent as
  * base64 in the request body. Once the Cal.com booking succeeds, the slip is
- * emailed as an attachment — same delivery config as /api/enquiry:
+ * emailed as an attachment — same delivery config as /api/enquiry.
+ *
+ * Optional `lengthInMinutes` lets the booker pick a duration for event types
+ * that have Cal.com's "allow booker to select from multiple durations"
+ * enabled (used for the training hall — 60/120/180 min). It must match one
+ * of the durations configured on that event type in Cal.com, or the booking
+ * request will be rejected upstream.
  *
  *   RESEND_API_KEY     Send the slip + booking summary as an email via Resend.
  *   NOTIFY_TO          Email address to notify   (default hello@takaya.om)
@@ -81,12 +87,27 @@ export async function onRequestPost({ request, env }) {
   const timeZone = clean(raw.timeZone, 60) || 'Asia/Muscat';
   const slip = raw.slip;
 
+  // Optional — only meaningful for event types with "allow booker to select
+  // from multiple durations" enabled in Cal.com (e.g. the training hall).
+  // Must match one of the durations configured on that event type, or
+  // Cal.com will reject the booking.
+  let lengthInMinutes = null;
+  if (raw.lengthInMinutes !== undefined && raw.lengthInMinutes !== null && raw.lengthInMinutes !== '') {
+    const n = Number(raw.lengthInMinutes);
+    if (!Number.isInteger(n) || n < 15 || n > 480) {
+      lengthInMinutes = NaN; // flagged below
+    } else {
+      lengthInMinutes = n;
+    }
+  }
+
   const errors = {};
   if (!/^\d+$/.test(eventTypeId)) errors.eventTypeId = 'Missing programme or space.';
   if (!start || Number.isNaN(Date.parse(start))) errors.start = 'Missing or invalid time.';
   if (name.length < 2) errors.name = 'Please enter your name.';
   if (!validEmail(email)) errors.email = 'Please enter a valid email address.';
   if (!phone) errors.phone = 'Please enter your phone number.';
+  if (Number.isNaN(lengthInMinutes)) errors.lengthInMinutes = 'Invalid booking duration.';
   const slipError = validateSlip(slip);
   if (slipError) errors.slip = slipError;
 
@@ -99,6 +120,9 @@ export async function onRequestPost({ request, env }) {
     start,
     attendee: { name, email, timeZone },
   };
+  if (lengthInMinutes) {
+    payload.lengthInMinutes = lengthInMinutes;
+  }
   if (phone) {
     // Kept out of the core attendee object (Cal.com's schema doesn't
     // guarantee a phone field per event type) — surfaced as a note instead.
