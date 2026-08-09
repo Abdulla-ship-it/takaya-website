@@ -225,25 +225,18 @@ section { padding-block: var(--section); }
   letter-spacing: 0.02em;
   text-decoration: none;
   border: 1px solid transparent;
-  clip-path: polygon(
-    16px 0, 100% 0, 100% calc(100% - 16px),
-    calc(100% - 16px) 100%, 0 100%, 0 16px
-  );
+  border-radius: 18px;
   transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease),
     background 0.3s var(--ease), color 0.3s var(--ease);
   white-space: nowrap;
 }
-/* Thin inset keyline, like the grout line between glazed tiles —
-   sits just inside the cut corners on the filled variants. */
+/* Thin inset keyline on the filled variants. */
 .btn-primary::before,
 .btn-brass::before {
   content: "";
   position: absolute;
   inset: 3px;
-  clip-path: polygon(
-    13px 0, 100% 0, 100% calc(100% - 13px),
-    calc(100% - 13px) 100%, 0 100%, 0 13px
-  );
+  border-radius: 15px;
   border: 1px solid rgba(241, 243, 242, 0.22);
   pointer-events: none;
 }
@@ -309,17 +302,11 @@ section { padding-block: var(--section); }
 .btn-sm {
   padding: 0.68rem 1.4rem;
   font-size: 0.82rem;
-  clip-path: polygon(
-    11px 0, 100% 0, 100% calc(100% - 11px),
-    calc(100% - 11px) 100%, 0 100%, 0 11px
-  );
+  border-radius: 14px;
 }
 .btn-sm.btn-primary::before, .btn-sm.btn-brass::before {
   inset: 2px;
-  clip-path: polygon(
-    9px 0, 100% 0, 100% calc(100% - 9px),
-    calc(100% - 9px) 100%, 0 100%, 0 9px
-  );
+  border-radius: 12px;
 }
 
 /* Text link with underline reveal */
