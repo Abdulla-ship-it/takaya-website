@@ -3,6 +3,53 @@
    Design system + global styles
    ============================================================ */
 
+/* ---------- 0. Self-hosted fonts ---------- */
+/* Thmanyah — Arabic typeface, self-hosted (license requires local hosting,
+   no CDN redistribution). Used for Arabic pages only: Serif Display for
+   headings, Sans for body/UI. Woff2 only, three weights per family. */
+@font-face {
+  font-family: "Thmanyah Sans";
+  src: url("/assets/fonts/thmanyah/sans/thmanyahsans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Thmanyah Sans";
+  src: url("/assets/fonts/thmanyah/sans/thmanyahsans-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Thmanyah Sans";
+  src: url("/assets/fonts/thmanyah/sans/thmanyahsans-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Thmanyah Serif Display";
+  src: url("/assets/fonts/thmanyah/serif-display/thmanyahserifdisplay-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Thmanyah Serif Display";
+  src: url("/assets/fonts/thmanyah/serif-display/thmanyahserifdisplay-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Thmanyah Serif Display";
+  src: url("/assets/fonts/thmanyah/serif-display/thmanyahserifdisplay-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ---------- 1. Tokens ---------- */
 /* Strict 3-colour palette, per brand direction: every token below resolves
    to one of exactly three hex values —
@@ -972,8 +1019,8 @@ button[disabled] { opacity: 0.6; cursor: not-allowed; }
    ============================================================ */
 
 [lang="ar"] {
-  --display: "Noto Kufi Arabic", "IBM Plex Sans Arabic", Tahoma, sans-serif;
-  --body:    "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  --display: "Thmanyah Serif Display", "Noto Kufi Arabic", "IBM Plex Sans Arabic", Tahoma, sans-serif;
+  --body:    "Thmanyah Sans", "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
 }
 
 [dir="rtl"] body { line-height: 1.8; }
