@@ -1107,6 +1107,43 @@ html.js .reveal.in { opacity: 1; transform: none; }
 .slot-btn:disabled { opacity: 0.35; cursor: not-allowed; text-decoration: line-through; }
 
 .wizard-summary { background: #F1F3F2; border: 1px solid var(--line-soft); border-radius: var(--radius-lg); padding: 1.5rem 1.75rem; margin-bottom: 1.75rem; }
+
+/* Bank transfer details card — shown on the final booking step */
+.bank-details {
+  background: #F1F3F2;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 1.4rem 1.6rem;
+  margin-bottom: 1.5rem;
+}
+.bank-details-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--ink);
+  margin: 0 0 0.9rem;
+}
+.bank-details dl { margin: 0; }
+.bank-details dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.45rem;
+  border-bottom: 1px solid var(--line-soft);
+}
+.bank-details dl > div:last-child { border-bottom: none; }
+.bank-details dt { color: var(--ink-mute); font-size: 0.86rem; }
+.bank-details dd {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--ink);
+  user-select: all;
+}
+.bank-details-note {
+  margin: 0.9rem 0 0;
+  font-size: 0.84rem;
+  color: var(--ink-mute);
+}
 .wizard-summary dl { display: grid; grid-template-columns: auto 1fr; gap: 0.6rem 1rem; margin: 0; font-size: 0.9rem; }
 .wizard-summary dt { color: var(--ink-mute); }
 .wizard-summary dd { margin: 0; font-weight: 500; color: var(--ink); text-align: end; }
