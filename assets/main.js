@@ -4,6 +4,9 @@
 (function () {
   'use strict';
 
+  /* JS is running — enable the reveal animation's hidden start state */
+  document.documentElement.classList.add('js');
+
   /* ---- Mobile nav ---- */
   var toggle = document.querySelector('.nav-toggle');
   var links  = document.querySelector('.nav-links');
