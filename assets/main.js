@@ -209,13 +209,13 @@
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(data.email || '')) clientErrors.email = true;
       if (Object.keys(clientErrors).length) {
         markInvalid(clientErrors);
-        say('Please check your name and email address, then try again.', 'error');
+        say('يرجى التحقق من الاسم والبريد الإلكتروني ثم المحاولة مرة أخرى.', 'error');
         return;
       }
 
       if (button) {
         button.disabled = true;
-        button.textContent = 'Sending…';
+        button.textContent = 'جارٍ الإرسال…';
       }
 
       fetch(form.getAttribute('action'), {
@@ -230,7 +230,7 @@
         })
         .then(function (r) {
           if (r.ok && r.body.ok) {
-            say('Thank you — your enquiry has been received. We reply within one working day, Sunday to Thursday.');
+            say('شكرًا لك — وصلنا استفسارك، وسنردّ عليك خلال يوم عمل واحد، من الأحد إلى الخميس.');
             form.reset();
           } else if (r.status === 422 && r.body.errors) {
             markInvalid(r.body.errors);
@@ -243,41 +243,49 @@
           // Happens when previewing the file locally, or if the network drops.
           // Never leave someone with a dead form — give them a direct route.
           say(
-            'We could not send that from here. Please email takayaoman@gmail.com or message us on WhatsApp and we will pick it up straight away.',
+            'تعذّر الإرسال من هنا. راسلنا على takayaoman@gmail.com أو عبر واتساب وسنتابع طلبك مباشرة.',
             'error'
           );
         })
         .then(function () {
           if (button) {
             button.disabled = false;
-            button.textContent = button.dataset.label || 'Send enquiry';
+            button.textContent = button.dataset.label || 'أرسل الاستفسار';
           }
         });
     });
   });
 
-  /* ---- Prefill enquiry subject from ?course= or ?package= ---- */
-  var params = new URLSearchParams(window.location.search);
-  var interest = params.get('course') || params.get('package');
-  if (interest) {
+  /* ---- Prefill enquiry subject ---- */
+  var setInterest = function (value) {
     var sel = document.querySelector('#interest');
-    if (sel) {
-      var matched = Array.prototype.some.call(sel.options, function (opt) {
-        if (opt.value.toLowerCase() === interest.toLowerCase()) {
-          sel.value = opt.value;
-          return true;
-        }
-        return false;
-      });
-      if (!matched) {
-        var opt = document.createElement('option');
-        opt.value = interest;
-        opt.textContent = interest;
-        sel.appendChild(opt);
-        sel.value = interest;
+    if (!sel || !value) return;
+    var matched = Array.prototype.some.call(sel.options, function (opt) {
+      if (opt.value.toLowerCase() === value.toLowerCase()) {
+        sel.value = opt.value;
+        return true;
       }
+      return false;
+    });
+    if (!matched) {
+      var opt = document.createElement('option');
+      opt.value = value;
+      opt.textContent = value;
+      sel.appendChild(opt);
+      sel.value = value;
     }
-  }
+  };
+
+  /* from ?course= / ?package= / ?interest= in the URL */
+  var params = new URLSearchParams(window.location.search);
+  setInterest(params.get('course') || params.get('package') || params.get('interest'));
+
+  /* from "استفسر الآن" links that jump to the contact section */
+  document.querySelectorAll('a[data-interest]').forEach(function (link) {
+    link.addEventListener('click', function () {
+      setInterest(link.getAttribute('data-interest'));
+    });
+  });
 
   /* ---- Footer year ---- */
   document.querySelectorAll('[data-year]').forEach(function (el) {

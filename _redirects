@@ -1,0 +1,6 @@
+# Old multi-page URLs -> sections of the single page
+/spaces.html /#spaces 301
+/individual-training.html /#training 301
+/coaching.html /#services 301
+/about.html /#about 301
+/contact.html /#contact 301

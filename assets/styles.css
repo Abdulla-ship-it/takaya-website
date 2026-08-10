@@ -187,6 +187,9 @@ p:last-child { margin-bottom: 0; }
 section { padding-block: var(--section); }
 .section-tight { padding-block: clamp(3rem, 6vw, 5.5rem); }
 
+/* One-page anchors: keep section headings clear of the sticky header */
+main [id] { scroll-margin-top: 95px; }
+
 .grid { display: grid; gap: clamp(1.5rem, 3vw, 2.75rem); }
 .g-2 { grid-template-columns: repeat(2, 1fr); }
 .g-3 { grid-template-columns: repeat(3, 1fr); }
