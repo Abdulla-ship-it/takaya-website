@@ -170,7 +170,7 @@ export async function onRequestPost({ request, env }) {
       ['Booking UID', body.data && body.data.uid ? body.data.uid : ''],
     ]
       .filter(([, v]) => v)
-      .map(([k, v]) => `<tr><td style="padding:4px 14px 4px 0;color:#3E5372">${k}</td><td style="padding:4px 0"><strong>${escapeHtml(String(v))}</strong></td></tr>`)
+      .map(([k, v]) => `<tr><td style="padding:4px 14px 4px 0;color:#2F5D38">${k}</td><td style="padding:4px 0"><strong>${escapeHtml(String(v))}</strong></td></tr>`)
       .join('');
 
     try {
@@ -186,7 +186,7 @@ export async function onRequestPost({ request, env }) {
           reply_to: email,
           subject: `New booking — ${name}`,
           html: `
-            <div style="font-family:system-ui,-apple-system,sans-serif;color:#3E5372;max-width:560px">
+            <div style="font-family:system-ui,-apple-system,sans-serif;color:#2F5D38;max-width:560px">
               <h2 style="margin:0 0 18px;font-weight:500">New booking, with payment slip attached</h2>
               <table style="font-size:14px;border-collapse:collapse">${rows}</table>
             </div>`,

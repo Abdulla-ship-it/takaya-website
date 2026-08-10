@@ -2,11 +2,9 @@
 <!-- Arabic-only site. Replace https://takaya.om with the live domain once connected. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://takaya.om/</loc><changefreq>monthly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://takaya.om/courses.html</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
   <url><loc>https://takaya.om/coaching.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
   <url><loc>https://takaya.om/spaces.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://takaya.om/individual-training.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://takaya.om/membership.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://takaya.om/book.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
   <url><loc>https://takaya.om/about.html</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
   <url><loc>https://takaya.om/contact.html</loc><changefreq>yearly</changefreq><priority>0.8</priority></url>
