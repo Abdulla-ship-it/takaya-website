@@ -1,7 +1,9 @@
 /* ============================================================
-   TAKAYA — booking wizard
+   TAKAYA — booking form (single page)
    Real availability comes from Cal.com via /api/slots and /api/book
    (Cloudflare Pages Functions) — the API key never reaches this file.
+   All sections live on one page and reveal progressively as the
+   visitor completes each choice; no step navigation.
    ============================================================ */
 (function () {
   'use strict';
@@ -57,62 +59,82 @@
     });
   }
 
-  var state = { step: 1, type: null, item: null, duration: null, slotsByDate: null, date: null, slotIso: null };
-
-  var steps = root.querySelectorAll('.wizard-step');
-  var progressDots = root.querySelectorAll('.wizard-progress span');
-  var nextBtn = root.querySelector('#next-btn');
-  var backBtn = root.querySelector('#back-btn');
-  var itemListEl = root.querySelector('#item-list');
-  var durationPickerEl = root.querySelector('#duration-picker');
-  var step2Eyebrow = root.querySelector('#step2-eyebrow');
-  var step2Title = root.querySelector('#step2-title');
-  var dayPickerEl = root.querySelector('#day-picker');
-  var slotGridEl = root.querySelector('#slot-grid');
-  var step3Sub = root.querySelector('#step3-sub');
-  var summaryEl = root.querySelector('#summary');
-  var summaryFinalEl = root.querySelector('#summary-final');
-  var form = root.querySelector('#booking-form');
-  var submitStatus = root.querySelector('#submit-status');
-  var slipInput = root.querySelector('#b-slip');
-  var slipHint = root.querySelector('#slip-hint');
-  var slipHintDefault = slipHint ? slipHint.textContent : '';
-  var MAX_SLIP_BYTES = 4 * 1024 * 1024;
-
   function fmtDate(iso) {
     return new Date(iso).toLocaleDateString('ar-OM', {
       timeZone: TIME_ZONE, weekday: 'long', day: 'numeric', month: 'long'
     });
   }
 
-  function render() {
-    steps.forEach(function (s) {
-      s.classList.toggle('active', Number(s.dataset.step) === state.step);
-    });
-    progressDots.forEach(function (dot) {
-      var n = Number(dot.dataset.step);
-      dot.classList.toggle('active', n === state.step);
-      dot.classList.toggle('done', n < state.step);
-    });
+  var state = { type: null, item: null, duration: null, slotsByDate: null, date: null, slotIso: null };
 
-    var nav = root.querySelector('#wizard-nav');
-    nav.style.display = state.step === 5 ? 'none' : 'flex';
-    backBtn.style.visibility = state.step === 1 ? 'hidden' : 'visible';
-    nextBtn.textContent = state.step === 4 ? 'تأكيد الحجز' : 'التالي';
-    updateNextEnabled();
-  }
+  var sections = {
+    type: root.querySelector('[data-section="type"]'),
+    item: root.querySelector('[data-section="item"]'),
+    slot: root.querySelector('[data-section="slot"]'),
+    details: root.querySelector('[data-section="details"]'),
+    success: root.querySelector('[data-section="success"]')
+  };
 
-  function updateNextEnabled() {
-    var ok = true;
-    if (state.step === 1) ok = !!state.type;
-    if (state.step === 2) ok = !!state.item && !!state.duration;
-    if (state.step === 3) ok = !!(state.date && state.slotIso);
-    if (state.step === 4) ok = form.checkValidity();
-    nextBtn.disabled = !ok;
-    nextBtn.style.opacity = ok ? '1' : '0.55';
-  }
-
+  var itemListEl = root.querySelector('#item-list');
+  var durationPickerEl = root.querySelector('#duration-picker');
+  var itemEyebrow = root.querySelector('#item-eyebrow');
+  var itemTitle = root.querySelector('#item-title');
+  var dayPickerEl = root.querySelector('#day-picker');
+  var slotGridEl = root.querySelector('#slot-grid');
+  var slotSub = root.querySelector('#slot-sub');
+  var summaryEl = root.querySelector('#summary');
+  var summaryFinalEl = root.querySelector('#summary-final');
+  var form = root.querySelector('#booking-form');
+  var submitBtn = root.querySelector('#submit-btn');
+  var submitStatus = root.querySelector('#submit-status');
+  var slipInput = root.querySelector('#b-slip');
+  var slipHint = root.querySelector('#slip-hint');
+  var slipHintDefault = slipHint ? slipHint.textContent : '';
+  var MAX_SLIP_BYTES = 4 * 1024 * 1024;
   var SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'application/pdf'];
+
+  function show(section, scroll) {
+    var el = sections[section];
+    if (!el) return;
+    var wasHidden = !el.classList.contains('active');
+    el.classList.add('active');
+    if (scroll && wasHidden) {
+      requestAnimationFrame(function () {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }
+
+  function hide(section) {
+    var el = sections[section];
+    if (el) el.classList.remove('active');
+  }
+
+  function updateSubmitEnabled() {
+    var ok = !!(state.slotIso && form.checkValidity());
+    submitBtn.disabled = !ok;
+    submitBtn.style.opacity = ok ? '1' : '0.55';
+  }
+
+  function updateSummary() {
+    if (!state.item || !state.slotIso) { summaryEl.innerHTML = ''; return; }
+    summaryEl.innerHTML = summaryRows();
+  }
+
+  function summaryRows() {
+    var durationRow = (state.item.durations && state.item.durations.length > 1)
+      ? '<dt>المدة</dt><dd>' + formatDuration(state.duration) + '</dd>'
+      : '';
+    return (
+      '<dl>' +
+      '<dt>النوع</dt><dd>' + TYPE_LABEL[state.type] + '</dd>' +
+      '<dt>الاختيار</dt><dd>' + state.item.name + '</dd>' +
+      durationRow +
+      '<dt>التاريخ</dt><dd>' + fmtDate(state.slotIso) + '</dd>' +
+      '<dt>الوقت</dt><dd class="ltr">' + timeLabel(state.slotIso) + '</dd>' +
+      '</dl>'
+    );
+  }
 
   function validateSlip() {
     if (!slipInput) return;
@@ -148,13 +170,39 @@
     });
   }
 
-  function selectType(type) {
+  /* ---- Flow ---- */
+
+  function resetFrom(level) {
+    // level: 'item' clears item + downstream, 'slot' clears slot downstream
+    if (level === 'item') {
+      state.item = null;
+      state.duration = null;
+    }
+    state.slotsByDate = null;
+    state.date = null;
+    state.slotIso = null;
+    hide('slot');
+    hide('details');
+    updateSummary();
+    updateSubmitEnabled();
+  }
+
+  function selectType(type, scroll) {
+    if (state.type === type) return;
     state.type = type;
-    state.item = null;
     root.querySelectorAll('.choice-card').forEach(function (c) {
       c.classList.toggle('selected', c.dataset.type === type);
     });
-    updateNextEnabled();
+    resetFrom('item');
+    populateItems();
+    show('item', scroll !== false);
+  }
+
+  function maybeStartSlots() {
+    if (state.item && state.duration) {
+      show('slot', true);
+      loadSlots();
+    }
   }
 
   function renderDurationPicker(item) {
@@ -178,7 +226,8 @@
         state.duration = mins;
         row.querySelectorAll('.duration-pill').forEach(function (b) { b.classList.remove('selected'); });
         btn.classList.add('selected');
-        updateNextEnabled();
+        resetFrom('slot');
+        maybeStartSlots();
       });
       row.appendChild(btn);
     });
@@ -188,9 +237,10 @@
 
   function populateItems() {
     var items = CATALOGUE[state.type] || [];
-    step2Eyebrow.textContent = TYPE_LABEL[state.type];
-    step2Title.textContent = state.type === 'course' ? 'اختر البرنامج' : 'اختر المساحة';
+    itemEyebrow.textContent = TYPE_LABEL[state.type];
+    itemTitle.textContent = state.type === 'course' ? 'اختر البرنامج' : 'اختر المساحة';
     itemListEl.innerHTML = '';
+    durationPickerEl.innerHTML = '';
     items.forEach(function (item) {
       var btn = document.createElement('button');
       btn.type = 'button';
@@ -203,8 +253,9 @@
         state.item = item;
         itemListEl.querySelectorAll('.item-card').forEach(function (c) { c.classList.remove('selected'); });
         btn.classList.add('selected');
+        resetFrom('slot');
         renderDurationPicker(item);
-        updateNextEnabled();
+        maybeStartSlots();
       });
       itemListEl.appendChild(btn);
     });
@@ -219,7 +270,7 @@
     state.slotIso = null;
     dayPickerEl.innerHTML = '';
     slotGridEl.innerHTML = '<p class="muted" style="font-size:0.88rem">جارٍ تحميل المواعيد المتاحة…</p>';
-    step3Sub.textContent = state.item ? state.item.name + ' — اختر الموعد الأنسب' : '';
+    slotSub.textContent = state.item ? state.item.name + ' — اختر الموعد الأنسب' : '';
 
     var url = '/api/slots?eventTypeId=' + encodeURIComponent(state.item.eventTypeId) +
       '&timeZone=' + encodeURIComponent(TIME_ZONE);
@@ -252,10 +303,12 @@
           btn.addEventListener('click', function () {
             state.date = dateKey;
             state.slotIso = null;
+            hide('details');
             dayPickerEl.querySelectorAll('.day-pill').forEach(function (p) { p.classList.remove('selected'); });
             btn.classList.add('selected');
             populateSlots();
-            updateNextEnabled();
+            updateSummary();
+            updateSubmitEnabled();
           });
           dayPickerEl.appendChild(btn);
           if (i === 0) btn.click();
@@ -264,7 +317,7 @@
       .catch(function () {
         dayPickerEl.innerHTML = '';
         slotGridEl.innerHTML = '';
-        step3Sub.innerHTML = '<span style="color:#8A3B22">تعذّر تحميل المواعيد المتاحة الآن. تواصل معنا مباشرة لتنسيق موعد.</span>';
+        slotSub.innerHTML = '<span style="color:#8A3B22">تعذّر تحميل المواعيد المتاحة الآن. تواصل معنا مباشرة لتنسيق موعد.</span>';
       });
   }
 
@@ -282,49 +335,12 @@
         state.slotIso = iso;
         slotGridEl.querySelectorAll('.slot-btn').forEach(function (b) { b.classList.remove('selected'); });
         btn.classList.add('selected');
-        updateNextEnabled();
+        updateSummary();
+        show('details', true);
+        updateSubmitEnabled();
       });
       slotGridEl.appendChild(btn);
     });
-  }
-
-  function summaryRows() {
-    var durationRow = (state.item.durations && state.item.durations.length > 1)
-      ? '<dt>المدة</dt><dd>' + formatDuration(state.duration) + '</dd>'
-      : '';
-    return (
-      '<dl>' +
-      '<dt>النوع</dt><dd>' + TYPE_LABEL[state.type] + '</dd>' +
-      '<dt>الاختيار</dt><dd>' + state.item.name + '</dd>' +
-      durationRow +
-      '<dt>التاريخ</dt><dd>' + fmtDate(state.slotIso) + '</dd>' +
-      '<dt>الوقت</dt><dd class="ltr">' + timeLabel(state.slotIso) + '</dd>' +
-      '</dl>'
-    );
-  }
-
-  function goNext() {
-    if (nextBtn.disabled) return;
-
-    if (state.step === 3) {
-      summaryEl.innerHTML = summaryRows();
-    }
-
-    if (state.step === 4) {
-      submitBooking();
-      return;
-    }
-
-    state.step += 1;
-    if (state.step === 2) populateItems();
-    if (state.step === 3) loadSlots();
-    render();
-  }
-
-  function goBack() {
-    if (state.step === 1) return;
-    state.step -= 1;
-    render();
   }
 
   function submitBooking() {
@@ -332,18 +348,19 @@
     if (data.company_website) return; // honeypot
 
     validateSlip();
-    if (!form.checkValidity()) {
-      updateNextEnabled();
+    if (!state.slotIso || !form.checkValidity()) {
+      form.reportValidity();
+      updateSubmitEnabled();
       return;
     }
 
-    nextBtn.disabled = true;
-    nextBtn.textContent = 'جارٍ رفع الإيصال…';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'جارٍ رفع الإيصال…';
     submitStatus.classList.remove('show', 'error');
 
     readSlipAsBase64()
       .then(function (slip) {
-        nextBtn.textContent = 'جارٍ الإرسال…';
+        submitBtn.textContent = 'جارٍ الإرسال…';
         var payload = {
           eventTypeId: state.item.eventTypeId,
           start: state.slotIso,
@@ -366,8 +383,8 @@
           summaryFinalEl.innerHTML = summaryRows();
           var slipWarning = root.querySelector('#slip-warning');
           if (slipWarning) slipWarning.classList.toggle('show', body.slipDelivered === false);
-          state.step = 5;
-          render();
+          ['type', 'item', 'slot', 'details'].forEach(hide);
+          show('success', true);
         } else {
           throw new Error((body && body.error) || 'failed');
         }
@@ -381,33 +398,36 @@
         submitStatus.classList.add('show', 'error');
       })
       .then(function () {
-        nextBtn.disabled = false;
-        nextBtn.textContent = 'تأكيد الحجز';
+        if (!sections.success.classList.contains('active')) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'تأكيد الحجز';
+        }
       });
   }
+
+  /* ---- Wiring ---- */
 
   root.querySelectorAll('.choice-card').forEach(function (card) {
     card.addEventListener('click', function () { selectType(card.dataset.type); });
   });
 
-  nextBtn.addEventListener('click', goNext);
-  backBtn.addEventListener('click', goBack);
-  form.addEventListener('submit', function (e) { e.preventDefault(); });
-  form.addEventListener('input', updateNextEnabled);
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    submitBooking();
+  });
+  form.addEventListener('input', updateSubmitEnabled);
   if (slipInput) {
     slipInput.addEventListener('change', function () {
       validateSlip();
-      updateNextEnabled();
+      updateSubmitEnabled();
     });
   }
 
   var params = new URLSearchParams(window.location.search);
   var presetType = params.get('type');
   if (presetType === 'course' || presetType === 'space') {
-    selectType(presetType);
-    state.step = 2;
-    populateItems();
+    selectType(presetType, false);
   }
 
-  render();
+  updateSubmitEnabled();
 })();

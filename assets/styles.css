@@ -1024,8 +1024,14 @@ html.js .reveal.in { opacity: 1; transform: none; }
 .wizard-progress span.done,
 .wizard-progress span.active { background: var(--green); }
 
-.wizard-step { display: none; }
+/* Single-page booking: sections stack and reveal progressively */
+.wizard-step { display: none; scroll-margin-top: 95px; }
 .wizard-step.active { display: block; }
+.wizard-step.active ~ .wizard-step.active {
+  margin-top: clamp(2.5rem, 5vw, 3.5rem);
+  padding-top: clamp(2rem, 4vw, 3rem);
+  border-top: 1px solid var(--line-soft);
+}
 
 .wizard-head { text-align: center; margin-bottom: 2rem; }
 .wizard-head .eyebrow { margin-bottom: 0.6rem; }

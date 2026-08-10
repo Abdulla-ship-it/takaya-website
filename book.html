@@ -6,14 +6,14 @@
 <title>احجز — معهد تكايا، مسقط</title>
 <meta name="description" content="احجز مقعدًا في أحد برامج تكايا أو احجز مساحة تدريب — في أربع خطوات بسيطة.">
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812">
+<link rel="stylesheet" href="/assets/styles.css?v=20260813">
 </head>
 <body>
 
 <header class="site-header">
   <div class="wrap nav">
     <a class="brand" href="/index.html">
-      <img class="brand-mark" src="/assets/logo-mark.svg?v=20260812" alt="تكايا">
+      <img class="brand-mark" src="/assets/logo-mark.svg?v=20260813" alt="تكايا">
     </a>
     <ul class="nav-links">
       <li><a href="/index.html">الرئيسية</a></li>
@@ -35,18 +35,11 @@
     <div class="wizard" data-wizard>
       <div class="pattern-emblem" aria-hidden="true"></div>
 
-      <div class="wizard-progress">
-        <span class="active" data-step="1"></span>
-        <span data-step="2"></span>
-        <span data-step="3"></span>
-        <span data-step="4"></span>
-      </div>
-
-      <div class="wizard-step active" data-step="1">
+      <div class="wizard-step active" data-section="type">
         <div class="wizard-head">
           <span class="eyebrow">الحجز</span>
           <h2>ماذا تودّ أن تحجز؟</h2>
-          <p>اختر برنامجًا أو مساحة، وسنرشدك للموعد المناسب.</p>
+          <p>اختر برنامجًا أو مساحة — كل الخطوات في هذه الصفحة.</p>
         </div>
         <div class="choice-grid">
           <button type="button" class="choice-card" data-type="course">
@@ -66,27 +59,26 @@
         </div>
       </div>
 
-      <div class="wizard-step" data-step="2">
+      <div class="wizard-step" data-section="item">
         <div class="wizard-head">
-          <span class="eyebrow" id="step2-eyebrow">البرامج</span>
-          <h2 id="step2-title">اختر البرنامج</h2>
-          <p>يمكنك دائمًا الرجوع لتغيير اختيارك.</p>
+          <span class="eyebrow" id="item-eyebrow">البرامج</span>
+          <h2 id="item-title">اختر البرنامج</h2>
         </div>
         <div class="item-list" id="item-list"></div>
         <div class="duration-picker" id="duration-picker"></div>
       </div>
 
-      <div class="wizard-step" data-step="3">
+      <div class="wizard-step" data-section="slot">
         <div class="wizard-head">
           <span class="eyebrow">الموعد</span>
           <h2>اختر يومًا ووقتًا</h2>
-          <p id="step3-sub"></p>
+          <p id="slot-sub"></p>
         </div>
         <div class="day-picker" id="day-picker"></div>
         <div class="slot-grid" id="slot-grid"></div>
       </div>
 
-      <div class="wizard-step" data-step="4">
+      <div class="wizard-step" data-section="details">
         <div class="wizard-head">
           <span class="eyebrow">أخيرًا</span>
           <h2>بياناتك</h2>
@@ -124,10 +116,11 @@
             </div>
           </div>
           <input type="text" name="company_website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
+          <button type="submit" class="btn btn-primary" id="submit-btn" style="width:100%; margin-top:1.2rem" disabled>تأكيد الحجز</button>
         </form>
       </div>
 
-      <div class="wizard-step" data-step="5">
+      <div class="wizard-step" data-section="success">
         <div class="wizard-success">
           <div class="check-circle" aria-hidden="true">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
@@ -137,11 +130,6 @@
         </div>
         <div class="wizard-summary" id="summary-final"></div>
         <p class="form-status error" id="slip-warning">تم تأكيد حجزك، لكن تعذّر استلام إيصال التحويل تلقائيًا. الرجاء إرساله عبر واتساب أو البريد الإلكتروني.</p>
-      </div>
-
-      <div class="wizard-nav" id="wizard-nav">
-        <button type="button" class="wizard-back" id="back-btn">رجوع</button>
-        <button type="button" class="btn btn-primary" id="next-btn" disabled>التالي</button>
       </div>
 
     </div>
@@ -158,7 +146,7 @@
   </div>
 </footer>
 
-<script src="/assets/main.js?v=20260812"></script>
-<script src="/assets/book.js?v=20260812"></script>
+<script src="/assets/main.js?v=20260813"></script>
+<script src="/assets/book.js?v=20260813"></script>
 </body>
 </html>
